@@ -1,19 +1,23 @@
 import os
-# import sys
-#
-# modules_a = True
-# if "selenium" not in sys.modules:
-#     input("You have not installed python module: \"selenium\", please install "
-#           "it by using \"pip install selenium\" in command prompt")
-#     modules_a = False
-# if "idm" not in sys.modules:
-#     input("You have not installed python module: \"idm\", please install "
-#           "it by using \"pip install idm\" in command prompt")
-#     modules_a = False
-#
-# if not modules_a:
-#     input("Since the program does not have the required files, it will exit")
-#     exit()
+
+modules_a = True
+try:
+    import selenium
+except ModuleNotFoundError:
+    input("You have not installed python module: \"selenium\", please install "
+          "it by using \"pip install selenium\" in command prompt")
+    modules_a = False
+
+try:
+    import idm
+except ModuleNotFoundError:
+    input("You have not installed python module: \"idm\", please install "
+          "it by using \"pip install idm\" in command prompt")
+    modules_a = False
+
+if not modules_a:
+    input("Since the program does not have the required files, it will exit")
+    exit()
 
 from Core import *
 from selenium.common.exceptions import *
