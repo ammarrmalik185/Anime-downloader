@@ -31,12 +31,20 @@ options = Options(
     # if the program does not find the anime in the required resolution, it will download in best resolution possible
     logs=False,
     # the program will create logs (used for debugging)
-    download_path="D:\\Animes",
+    download_path="C:\\Animes",
     # your download path
     pages_to_scan=1,
     # how many pages should the program scan for animes
-    quality={"type": "force_res", "value": "720p"},
-    # in what resolution should the episodes be downloaded (360p, 480p, 720p, 1080p, or source)
+    quality={"type": "force_res", "value": "1080p"},
+    # in what resolution should the episodes be downloaded (360p, 480p, 720p, 1080p, or source),
+    auto_exit=False,
+    # should the program automatically handle errors?
+    auto_exception_control=True,
+    # automatically handle exceptions
+    max_refresh_page=5,
+    # if the crawler fails to open a page, how many times should it retry?
+    generate_log_file=False
+    # program will create a core.log file to log events
 )
 
 sep = "<EP>"
@@ -100,21 +108,33 @@ def core():
     crawler.start_part_1()
     info = crawler.get_mid_term_data()
 
-    print("-------------------------Found but not downloading--------------------------\n")
+    if len(info[1]) != 0:
+        print("-------------------------Found but not downloading--------------------------\n")
 
-    for i in info[1]:
-        single_anime_string = ""
-        single_anime_string += ("Name       : " + i["name"]) + "\n"
-        single_anime_string += ("Episode no : " + i["ep_no"]) + "\n"
+        print_strings = []
+        for i in info[1]:
+            single_anime_string = ""
+            single_anime_string += ("Name       : " + i["name"]) + "\n"
+            single_anime_string += ("Episode no : " + i["ep_no"]) + "\n"
+            print_strings.append(single_anime_string)
 
-        print(single_anime_string)
+        print_strings.reverse()
+        for i in print_strings:
+            print(i)
 
-    print("---------------------------------Downloading--------------------------------\n")
+    if len(info[0]) != 0:
+        print("---------------------------------Downloading--------------------------------\n")
 
-    for i in info[0]:
-        print("Name       : " + i["name"])
-        print("Episode no : " + i["ep_no"])
-        print("")
+        print_strings = []
+        for i in info[0]:
+            single_anime_string = ""
+            single_anime_string += ("Name       : " + i["name"]) + "\n"
+            single_anime_string += ("Episode no : " + i["ep_no"]) + "\n"
+            print_strings.append(single_anime_string)
+
+        print_strings.reverse()
+        for i in print_strings:
+            print(i)
 
     crawler.start_part_2()
 
@@ -125,6 +145,8 @@ def core():
             anime_no += 1
 
     for data in end_data[1]:
+        if data["status"] == "504":
+            print(data["name"] + " Episode No : " + data["ep_no"] + " unable to load")
         if data["status"] == "404":
             print(data["name"] + " Episode No : " + data["ep_no"] + " not found in selected quality")
 
@@ -132,6 +154,10 @@ def core():
     save(save_data[0], save_data[1])
 
     crawler.download_animes()
+    crawler.close_crawler()
+
+    if options.auto_exit:
+        exit()
 
     if anime_no != 0:
         re = input(str(anime_no) + " anime(s) downloading ...press enter to continue")
@@ -162,15 +188,18 @@ def run_main():
         try:
             core()
         except SessionNotCreatedException:
-            input("Session creation failed, make sure that chromedrive.exe is in the folder and "
+            input("Session creation failed, make sure that chromedriver.exe is in the folder and "
                   "is updated to your chrome browser version")
-        except Exception:
+        except Exception as ex:
+            print(str(ex.args))
+            if not options.auto_exception_control:
+                raise ex
             exceptionControl[0] += 1
             if exceptionControl[0] < exceptionControl[1]:
-                print("Minor error occurred .. retrying")
+                print("major error occurred .. retrying")
                 run_main()
             else:
-                input("max exceptions occurred .. press enter to exit...")
+                input("major error occurred too many times, cannot continue .. press enter to exit...")
 
 
 run_main()
