@@ -1,8 +1,0 @@
-# this is where the program stores which episodes it has downloaded (try not to edit this, but if you do, dont leave any blank lines in this entire file)
-Kami-tachi ni Hirowareta Otoko<EP>3
-Munou na Nana<EP>3
-Yuukoku no Moriarty<EP>2
-One Piece<EP>946
-Mahouka Koukou no Rettousei: Raihousha-hen<EP>3
-Taisou Zamurai<EP>2
-Kamisama ni Natta Hi<EP>2
